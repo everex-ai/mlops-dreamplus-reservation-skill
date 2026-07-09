@@ -1,0 +1,9 @@
+[
+  { "roomCode": 201, "roomName": "Meeting Room 2A", "floor": 2, "maxMember": 8, "equipment": "TV, 화이트보드", "point": 10000 },
+  { "roomCode": 202, "roomName": "Meeting Room 2B", "floor": 2, "maxMember": 18, "equipment": "빔프로젝터, 화이트보드", "point": 20000 },
+  { "roomCode": 203, "roomName": "Meeting Room 2C", "floor": 2, "maxMember": 6, "equipment": "TV, 화이트보드", "point": 10000 },
+  { "roomCode": 204, "roomName": "Meeting Room 2D", "floor": 2, "maxMember": 6, "equipment": "TV, 화이트보드", "point": 10000 },
+  { "roomCode": 208, "roomName": "Meeting Room 2H", "floor": 2, "maxMember": 4, "equipment": "TV, 화이트보드", "point": 10000 },
+  { "roomCode": 301, "roomName": "Meeting Room 3A", "floor": 3, "maxMember": 4, "equipment": "TV, 화이트보드", "point": 10000 },
+  { "roomCode": 1101, "roomName": "Meeting Room 11A", "floor": 11, "maxMember": 8, "equipment": "TV, 화이트보드", "point": 10000 }
+]

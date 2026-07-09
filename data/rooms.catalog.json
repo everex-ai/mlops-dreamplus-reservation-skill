@@ -1,0 +1,311 @@
+{
+  "center": "gangnam",
+  "generatedFrom": "/api2/meetingrooms",
+  "roomCount": 38,
+  "rooms": [
+    {
+      "roomCode": 201,
+      "roomName": "Meeting Room 2A",
+      "floor": 2,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 202,
+      "roomName": "Meeting Room 2B",
+      "floor": 2,
+      "maxMember": 18,
+      "equipment": "빔프로젝터, 화이트보드",
+      "point": 20000
+    },
+    {
+      "roomCode": 203,
+      "roomName": "Meeting Room 2C",
+      "floor": 2,
+      "maxMember": 6,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 204,
+      "roomName": "Meeting Room 2D",
+      "floor": 2,
+      "maxMember": 6,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 205,
+      "roomName": "Meeting Room 2E",
+      "floor": 2,
+      "maxMember": 6,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 206,
+      "roomName": "Meeting Room 2F",
+      "floor": 2,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 207,
+      "roomName": "Meeting Room 2G",
+      "floor": 2,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 208,
+      "roomName": "Meeting Room 2H",
+      "floor": 2,
+      "maxMember": 4,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 209,
+      "roomName": "Meeting Room 2I",
+      "floor": 2,
+      "maxMember": 4,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 210,
+      "roomName": "Meeting Room 2J",
+      "floor": 2,
+      "maxMember": 18,
+      "equipment": "빔프로젝터, 화이트보드",
+      "point": 20000
+    },
+    {
+      "roomCode": 301,
+      "roomName": "Meeting Room 3A",
+      "floor": 3,
+      "maxMember": 4,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 302,
+      "roomName": "Meeting Room 3B",
+      "floor": 3,
+      "maxMember": 4,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 303,
+      "roomName": "Meeting Room 3C",
+      "floor": 3,
+      "maxMember": 4,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 304,
+      "roomName": "Meeting Room 3D",
+      "floor": 3,
+      "maxMember": 4,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 305,
+      "roomName": "Meeting Room 3E",
+      "floor": 3,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 306,
+      "roomName": "Meeting Room 3F",
+      "floor": 3,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 701,
+      "roomName": "Meeting Room 7A",
+      "floor": 7,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 702,
+      "roomName": "Meeting Room 7B",
+      "floor": 7,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 801,
+      "roomName": "Meeting Room 8A",
+      "floor": 8,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 802,
+      "roomName": "Meeting Room 8B",
+      "floor": 8,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 901,
+      "roomName": "Meeting Room 9A",
+      "floor": 9,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 902,
+      "roomName": "Meeting Room 9B",
+      "floor": 9,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1001,
+      "roomName": "Meeting Room 10A",
+      "floor": 10,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1002,
+      "roomName": "Meeting Room 10B",
+      "floor": 10,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1101,
+      "roomName": "Meeting Room 11A",
+      "floor": 11,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1102,
+      "roomName": "Meeting Room 11B",
+      "floor": 11,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1201,
+      "roomName": "Meeting Room 12A",
+      "floor": 12,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1202,
+      "roomName": "Meeting Room 12B",
+      "floor": 12,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1301,
+      "roomName": "Meeting Room 13A",
+      "floor": 13,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1302,
+      "roomName": "Meeting Room 13B",
+      "floor": 13,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1401,
+      "roomName": "Meeting Room 14A",
+      "floor": 14,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1402,
+      "roomName": "Meeting Room 14B",
+      "floor": 14,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1601,
+      "roomName": "Meeting Room 16A",
+      "floor": 16,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1602,
+      "roomName": "Meeting Room 16B",
+      "floor": 16,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1701,
+      "roomName": "Meeting Room 17A",
+      "floor": 17,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1702,
+      "roomName": "Meeting Room 17B",
+      "floor": 17,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1901,
+      "roomName": "Meeting Room 19A",
+      "floor": 19,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    },
+    {
+      "roomCode": 1902,
+      "roomName": "Meeting Room 19B",
+      "floor": 19,
+      "maxMember": 8,
+      "equipment": "TV, 화이트보드",
+      "point": 10000
+    }
+  ]
+}

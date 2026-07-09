@@ -1,0 +1,6 @@
+[
+  { "id": 1001, "roomCode": 201, "roomName": "Meeting Room 2A", "startTime": "2026.07.09 10:00", "endTime": "2026.07.09 14:00", "title": "온보딩세션", "memberId": 102383, "memberName": "익명", "companyName": "타사", "reservationState": 531, "reservationStateName": "예약 완료", "point": -20000 },
+  { "id": 1002, "roomCode": 201, "roomName": "Meeting Room 2A", "startTime": "2026.07.09 17:00", "endTime": "2026.07.09 19:00", "title": "팀 회의", "memberId": 107858, "memberName": "나", "companyName": "에버엑스", "reservationState": 531, "reservationStateName": "예약 완료", "point": -20000 },
+  { "id": 1003, "roomCode": 202, "roomName": "Meeting Room 2B", "startTime": "2026.07.09 09:00", "endTime": "2026.07.09 10:00", "title": "스탠드업", "memberId": 102383, "memberName": "익명", "companyName": "타사", "reservationState": 531, "reservationStateName": "예약 완료", "point": -20000 },
+  { "id": 1004, "roomCode": 203, "roomName": "Meeting Room 2C", "startTime": "2026.07.09 08:00", "endTime": "2026.07.09 21:00", "title": "종일 워크숍", "memberId": 102383, "memberName": "익명", "companyName": "타사", "reservationState": 531, "reservationStateName": "예약 완료", "point": -260000 }
+]

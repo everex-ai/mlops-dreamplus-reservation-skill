@@ -1,0 +1,13 @@
+{
+  "name": "dreamplus-res",
+  "version": "0.1.0",
+  "description": "드림플러스 강남 회의실 예약 Claude Code 스킬",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
