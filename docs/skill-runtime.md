@@ -71,7 +71,24 @@ Node 스크립트(`bin/*.mjs`)는 순수 렌더/판단만 담당한다.
 })()
 ```
 
-**내 예약만 (cancel용)** — `memberId === myId` 필터(작음): 위와 같되
+**요청 시간대에 겹치는 예약 (book용, 전 회의실)** — 그 시간에 찬 방만이라 작고 **완전**하다
+(안 겹치는 방은 전부 비어있음 → 층 무관 정확한 대안 계산). START/END는 'HH:mm':
+
+```js
+(async () => {
+  const me = JSON.parse(sessionStorage.getItem('meInfo'));
+  const r = await fetch('/api2/meetingroom/reservations', { method:'POST', credentials:'include',
+    headers:{'Content-Type':'application/json',Authorization:me.jwtToken},
+    body: JSON.stringify({data:{searchType:'startTime',startTime:'DATE 00:00:00',endTime:'DATE 23:59:59',cancelDate:'DATE 00:00:00'}})}).then(x=>x.json());
+  if (r.code === '301') return 'RELOAD';
+  const s = 'START', e = 'END';                 // 'HH:mm'은 사전순=시간순
+  return JSON.stringify((r.list||[])
+    .filter(x => x.startTime.slice(11,16) < e && s < x.endTime.slice(11,16)) // [s,e) 겹침
+    .map(x => [x.roomCode, x.startTime.slice(11,16), x.endTime.slice(11,16)]));
+})()
+```
+
+**내 예약만 (cancel용)** — `memberId === myId` 필터(작음): "한 회의실 전체"와 같되
 `.filter(x => x.memberId === me.id)` 사용.
 
 받은 JSON 문자열을 `bin/*.mjs`에 stdin으로 파이프한다. 예:
