@@ -1,0 +1,11 @@
+{
+  "name": "everex-dreamplus",
+  "owner": { "name": "EverEx Innovation Office", "email": "liam@everex.co.kr" },
+  "plugins": [
+    {
+      "name": "dreamplus",
+      "source": ".",
+      "description": "드림플러스 강남 회의실 조회·예약·취소 스킬"
+    }
+  ]
+}

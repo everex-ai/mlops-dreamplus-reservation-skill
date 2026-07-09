@@ -92,25 +92,29 @@
 **결정**: 토큰은 Chrome에서 신선하게 추출, API 호출은 Node 스크립트에서 수행. 기능별로 별도 스킬.
 
 ```
-dreamplus-res/                         ← GitHub 레포 루트
-├── README.md                          ← 설치·전제조건·사용법 (사내 공유용)
+dreamplus-res/                         ← GitHub 레포 = Claude Code 플러그인 겸 마켓플레이스
+├── README.md                          ← 설치(플러그인 원라이너)·사용법 (사내 공유용)
+├── .claude-plugin/
+│   ├── plugin.json                    ← 플러그인 매니페스트 (name: dreamplus)
+│   └── marketplace.json               ← 마켓플레이스 카탈로그 (everex-dreamplus)
 ├── lib/                               ← 공유 Node ESM 모듈 (외부 의존성 0, 내장 fetch)
-│   ├── time.mjs                       ← 날짜/시간 포맷·슬롯 계산 (08–21, 30분)·CJK 폭
-│   ├── api.mjs                        ← apiFetch + get/create/cancel, 301→TokenExpiredError
-│   ├── board.mjs                      ← buildBoard(정규화)·resolveRoom·isFree·nearestFreeRooms
-│   └── render.mjs                     ← Board→ASCII 렌더 (renderTimebar / renderStatus)
-├── bin/                               ← 스킬이 호출하는 CLI 엔트리 (예약 데이터를 stdin으로 받음)
-│   ├── status.mjs                     ← 조회
-│   ├── timebar.mjs                    ← 단일 회의실 바
-│   ├── book.mjs                       ← 예약 (+ 폴백 후보)
-│   └── cancel.mjs                     ← 취소
-├── test/                             ← 순수 로직 단위 테스트 (실측 픽스처)
-│   └── fixtures/                      ← 캡처한 실제 응답 샘플 (PII 제거)
-└── .claude/skills/
-    ├── dreamplus-status/SKILL.md
-    ├── dreamplus-timebar/SKILL.md
-    ├── dreamplus-book/SKILL.md
-    └── dreamplus-cancel/SKILL.md
+│   ├── time.mjs                       ← 날짜/시간·슬롯(08–21,30분)·CJK 폭·요일
+│   ├── api.mjs                        ← 브라우저 fetch의 참조 규격(get/create/cancel, 301 처리)
+│   ├── catalog.mjs                    ← 커밋된 회의실 카탈로그 로더
+│   ├── board.mjs                      ← normalizeBoard·isFree·resolveRoom·nearestFreeRooms·expand
+│   ├── render.mjs                     ← Board→ASCII (timebar/status, shade·color)
+│   └── cli.mjs                        ← 인자 파서·stdin 로드·색상 판정
+├── bin/                               ← 스킬이 호출하는 CLI (예약 데이터를 stdin으로 받음)
+│   ├── status.mjs / timebar.mjs       ← 그리드 / 단일 회의실 (한 조회 스킬이 분기 호출)
+│   ├── book.mjs / cancel.mjs          ← 예약(+폴백) / 취소 — @@ACTION@@ emit
+│   └── refresh-catalog.mjs            ← 카탈로그 재생성
+├── data/rooms.catalog.json            ← 실측 38개 방(정적)
+├── docs/skill-runtime.md              ← 스킬 공용 실행 절차·fetch 스니펫
+├── test/ (+fixtures/)                 ← 순수 로직 단위 테스트 (실측 픽스처)
+└── skills/                            ← 플러그인 스킬 (/dreamplus:<name>)
+    ├── status/SKILL.md                ← 조회(현황 그리드 + 단일 타임바 통합)
+    ├── book/SKILL.md                  ← 예약
+    └── cancel/SKILL.md                ← 취소
 ```
 
 ### 3.1 실행 흐름 (모든 스킬 공통) — **토큰은 브라우저 밖으로 안 나감**

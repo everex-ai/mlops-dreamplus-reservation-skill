@@ -1,0 +1,6 @@
+{
+  "name": "dreamplus",
+  "description": "드림플러스 강남 회의실 조회·예약·취소 스킬 (Claude Code)",
+  "version": "0.1.0",
+  "author": { "name": "EverEx Innovation Office", "email": "liam@everex.co.kr" }
+}
