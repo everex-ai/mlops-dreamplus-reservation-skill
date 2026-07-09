@@ -18,9 +18,11 @@
 Claude Code에서 아래 두 줄이면 끝입니다(어느 프로젝트에서든 사용 가능):
 
 ```
-/plugin marketplace add <GitHub-owner>/dreamplus-res
+/plugin marketplace add everex-ai/mlops-dreamplus-reservation-skill
 /plugin install dreamplus@everex-dreamplus
 ```
+
+> 저장소가 **public**이어야 사내원이 그대로 추가할 수 있습니다(private면 각자 `GITHUB_TOKEN` 필요).
 
 이후 대화창에 자연어로 말하거나(`"드림플러스 7층 예약현황"`), `/dreamplus:status` 처럼 직접 부릅니다. 로그인이 안 되어 있으면 로그인하라고 안내합니다.
 
