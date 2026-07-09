@@ -99,7 +99,7 @@ dreamplus-res/                         ← GitHub 레포 루트
 │   ├── api.mjs                        ← apiFetch + get/create/cancel, 301→TokenExpiredError
 │   ├── board.mjs                      ← buildBoard(정규화)·resolveRoom·isFree·nearestFreeRooms
 │   └── render.mjs                     ← Board→ASCII 렌더 (renderTimebar / renderStatus)
-├── bin/                               ← 스킬이 호출하는 CLI 엔트리 (DP_TOKEN env 사용)
+├── bin/                               ← 스킬이 호출하는 CLI 엔트리 (예약 데이터를 stdin으로 받음)
 │   ├── status.mjs                     ← 조회
 │   ├── timebar.mjs                    ← 단일 회의실 바
 │   ├── book.mjs                       ← 예약 (+ 폴백 후보)
@@ -113,18 +113,20 @@ dreamplus-res/                         ← GitHub 레포 루트
     └── dreamplus-cancel/SKILL.md
 ```
 
-### 3.1 토큰 프리플라이트 (모든 스킬 공통)
+### 3.1 실행 흐름 (모든 스킬 공통) — **토큰은 브라우저 밖으로 안 나감**
 
-각 SKILL.md는 실행 시 다음을 지시한다:
+> 구현 확정: 초기엔 "토큰을 Node로 전달(DP_TOKEN)"을 검토했으나, 이 하네스에서 토큰을 셸로
+> 옮기는 것이 안전필터/클립보드 제약으로 불안정했다. 대신 **브라우저가 네트워크(토큰 보유),
+> Node는 순수 렌더/판단**으로 정리했다. 상세 절차는 `docs/skill-runtime.md`.
 
-1. claude-in-chrome으로 드림플러스 탭 확보(없으면 생성·이동). in-page JS로:
-   - `sessionStorage.meInfo` 읽어 로그인 여부 확인 → 없거나 `/login`이면 **"Chrome에서 드림플러스에 로그인해 주세요"** 안내 후 중단 (요구사항 1)
-   - `meInfo.jwtToken` 추출 + 가벼운 호출로 유효성 테스트 (요구사항 2)
-   - `code==="301"`이면 탭 리로드로 앱 토큰 갱신 유도 → 재추출 (1회 재시도)
-2. 유효 토큰을 `DP_TOKEN` 환경변수로 Node 스크립트에 전달
-3. 스크립트가 `TOKEN_EXPIRED` 종료코드 반환 시 → 1번 재수행 후 1회 재시도
-
-> 토큰은 Chrome→스크립트로만 전달되며 사용자에게 출력하지 않는다.
+1. **프리플라이트** — claude-in-chrome으로 드림플러스 탭 확보. in-page JS로 `sessionStorage.meInfo`
+   확인 → 없거나 `/login`이면 **"Chrome에서 드림플러스에 로그인해 주세요"** 안내 후 중단(요구사항 1). `myId` 확보.
+2. **읽기** — 브라우저가 `meInfo.jwtToken`으로 예약을 in-page fetch(요구사항 2) → **민감정보 제거한
+   데이터만** 반환. 그리드는 컴팩트 `[[roomCode,'HH:mm','HH:mm']]`(층 스코프면 컨텍스트에 들어감),
+   단일 방/내 예약은 전체 객체(작음). `code==="301"`이면 탭 새로고침(앱 자동 재발급) 후 1회 재시도.
+3. **렌더/판단** — 데이터를 `bin/*.mjs`에 stdin으로 파이프. Node는 토큰·네트워크 없음.
+4. **쓰기(book/cancel)** — Node가 `@@ACTION@@` payload를 emit → **사용자 확인 후** 브라우저에서
+   POST(create)/DELETE(cancel) in-page 실행.
 
 ### 3.2 핵심 데이터 구조: `Board` (단일 소스)
 
