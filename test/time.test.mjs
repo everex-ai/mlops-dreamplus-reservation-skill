@@ -7,7 +7,19 @@ import {
   slotIndex,
   dispWidth,
   normalizeDate,
+  weekday,
+  padDisp,
 } from '../lib/time.mjs';
+
+test('weekday returns the Korean day-of-week', () => {
+  assert.equal(weekday('2026.07.09'), '목'); // Thursday
+  assert.equal(weekday('2026-07-11'), '토'); // Saturday
+});
+
+test('padDisp pads to a display width, counting CJK as 2', () => {
+  assert.equal(padDisp('2A', 6), '2A    '); // 2 + 4 spaces
+  assert.equal(padDisp('8인', 6), '8인   '); // width 3 + 3 spaces
+});
 
 test('normalizeDate accepts YYYY.MM.DD and passes it through', () => {
   assert.equal(normalizeDate('2026.07.09'), '2026.07.09');
