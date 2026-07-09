@@ -1,0 +1,106 @@
+Copyright © 2025 EverEx. All rights reserved.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EverExAI Code 라이선스 (CC BY-NC-ND 4.0 기반)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+본 소스코드는 EverEx(이하 "회사")에 의해 개발되었으며, 
+회사는 본 라이선스 하에서 다음 조건으로 코드를 배포하고 사용을 허가합니다:
+
+1. 비상업적 사용 제한 (회사 예외)
+   - 회사 외 제3자(개인, 조직, 기타 단체)는 비상업적 용도로만 본 코드를 사용할 수 있습니다.
+   - 회사는 본 코드를 상업적 용도(제품, 서비스, 유료 제공 등)로 활용할 수 있으며, 이에 대한 제한을 받지 않습니다.
+
+2. 수정 및 파생물 생성 금지 (회사·허가된 협력사 예외)
+   - 회사 외 제3자는 본 코드를 변경, 수정, 번역, 확장, 리버스 엔지니어링, 2차적 저작물(파생물)을 생성할 수 없습니다.
+   - 단, 회사 내부(직원) 또는 회사로부터 서면 승인을 받은 협력사·자회사는 
+     회사 업무 수행 목적에 한해서 본 코드를 수정하거나 파생물을 생성할 수 있습니다.
+
+3. 재배포 금지 (서면 승인 예외)
+   - 제3자는 본 코드를 복사·배포·공개·게시하거나, 이를 제3자에게 전달할 수 없습니다.
+   - 단, 회사가 사전에 서면으로 허가한 경우에 한하여 재배포가 가능합니다.
+
+4. 저작권 및 소유권 귀속
+   - 본 코드의 모든 권리(저작권 포함)는 회사에 귀속됩니다.
+   - 본 코드를 사용하는 제3자는 코드에 대한 소유권이나 저작권을 주장할 수 없습니다.
+
+5. 내부 사용 범위
+   - 본 코드는 회사 내부 프로젝트(회사 직원이 업무 목적으로 수행하는 프로젝트)에 한하여 사용이 허가됩니다.
+   - 재직 중인 직원은 업무 범위 내에서만 코드를 활용할 수 있습니다.
+   - 고용 관계가 종료되거나, 회사가 별도로 지정한 기간이 종료된 경우, 
+     해당 직원은 본 코드를 더 이상 사용할 수 없으며, 보관 중인 사본을 폐기·삭제해야 합니다.
+
+6. 협력사·자회사 예외
+   - 회사가 필요하다고 판단하여 서면 승인한 협력사 또는 자회사는 
+     본 코드를 일정 범위 내에서 열람·수정·배포할 수 있는 권한을 받을 수 있습니다.
+   - 이 경우에도 협력사·자회사는 본 라이선스의 제반 의무를 준수해야 합니다.
+
+7. 책임의 제한 (Disclaimer)
+   - 본 코드는 "있는 그대로(as is)" 제공되며, 명시적이든 묵시적이든 
+     어떠한 형태의 보증이나 책임도 회사가 부담하지 않습니다.
+   - 본 코드를 사용·수정·배포하는 과정에서 발생하는 어떠한 직접적·간접적 손해에 대하여서도 
+     회사는 책임을 지지 않습니다.
+
+8. 준거법 및 관할
+   - 본 라이선스 및 본 코드와 관련된 모든 분쟁은 [원하는 국가/지역]의 법률을 준거법으로 하며, 
+     해당 법원에 전속적 관할권이 있습니다.
+
+9. 기타
+   - 본 라이선스에 명시되지 않은 사항은 회사의 서면 동의 없이는 허용되지 않습니다.
+   - 본 라이선스의 일부 조항이 무효화되더라도, 나머지 조항들은 유효함을 유지합니다.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EverExAI Code License (Based on CC BY-NC-ND 4.0)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This source code ("the Code") is developed by EverEx ("the Company"). 
+The Company distributes and permits the use of the Code under the following conditions:
+
+1. Non-Commercial Use Restriction (Company Exemption)
+   - Any third party (individual, organization, or entity) other than the Company may use the Code **only for non-commercial purposes**.
+   - The Company is exempt from this restriction and may use the Code for commercial purposes 
+     (including products, services, or any paid offerings).
+
+2. No Derivative Works (Exceptions for the Company and Authorized Partners)
+   - Third parties may not modify, alter, translate, expand, reverse-engineer, or create derivative works 
+     based on the Code in whole or in part.
+   - However, the Company’s internal employees or specifically authorized partners/subsidiaries 
+     may modify or create derivative works of the Code **for the Company’s business purposes**, 
+     only with the Company’s prior written consent.
+
+3. No Redistribution (Written Permission Exception)
+   - Third parties may not copy, distribute, disclose, publish, or transmit the Code to any other party.
+   - Redistribution is permitted only with the Company’s prior written authorization.
+
+4. Copyright and Ownership
+   - All rights (including copyrights) to the Code belong to the Company.
+   - Third parties have no claim to ownership or copyrights of the Code.
+
+5. Internal Use Scope
+   - The Code is authorized for use in the Company’s internal projects (i.e., performed by the Company’s employees for work-related purposes).
+   - Employees may only use the Code for their job responsibilities while employed by the Company.
+   - Upon termination of employment or expiration of a specified period designated by the Company, 
+     the employee must cease using the Code and destroy/delete any copies in their possession.
+
+6. Exceptions for Partners and Subsidiaries
+   - Should the Company deem necessary, it may grant written permission for certain partners or subsidiaries 
+     to access, modify, or distribute the Code within a defined scope.
+   - Such authorized entities are still bound by all terms of this License.
+
+7. Disclaimer
+   - The Code is provided "as is," without warranties of any kind, express or implied.
+   - The Company shall not be liable for any direct or indirect damages, liabilities, or other losses 
+     arising from the use, modification, or distribution of the Code.
+
+8. Governing Law and Jurisdiction
+   - This License and any dispute related to the Code shall be governed by the laws of [Your Preferred Jurisdiction], 
+     and the courts of [Your Preferred Jurisdiction] shall have exclusive jurisdiction.
+
+9. Miscellaneous
+   - Any matters not specified in this License are not permitted without the Company’s prior written consent.
+   - If any provision of this License is held invalid, the remaining provisions shall remain in full force and effect.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This License is based on the Creative Commons BY-NC-ND 4.0 International License.  
+https://creativecommons.org/licenses/by-nc-nd/4.0/
