@@ -9,6 +9,7 @@ import {
   normalizeDate,
   weekday,
   padDisp,
+  addMinutes,
 } from '../lib/time.mjs';
 
 test('weekday returns the Korean day-of-week', () => {
@@ -19,6 +20,12 @@ test('weekday returns the Korean day-of-week', () => {
 test('padDisp pads to a display width, counting CJK as 2', () => {
   assert.equal(padDisp('2A', 6), '2A    '); // 2 + 4 spaces
   assert.equal(padDisp('8인', 6), '8인   '); // width 3 + 3 spaces
+});
+
+test('addMinutes advances a HH:mm time', () => {
+  assert.equal(addMinutes('12:30', 30), '13:00');
+  assert.equal(addMinutes('20:30', 30), '21:00');
+  assert.equal(addMinutes('09:00', 90), '10:30');
 });
 
 test('normalizeDate accepts YYYY.MM.DD and passes it through', () => {

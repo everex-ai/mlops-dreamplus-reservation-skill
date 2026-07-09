@@ -1,7 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { normalizeBoard, resolveRoom, isFree, nearestFreeRooms } from '../lib/board.mjs';
+import {
+  normalizeBoard,
+  resolveRoom,
+  isFree,
+  nearestFreeRooms,
+  myReservations,
+  expandReservations,
+} from '../lib/board.mjs';
 
 const rooms = JSON.parse(readFileSync(new URL('./fixtures/rooms.json', import.meta.url)));
 const reservations = JSON.parse(
@@ -11,6 +18,18 @@ const MY_ID = 107858;
 const board = normalizeBoard(rooms, reservations, '2026.07.09', MY_ID);
 
 const room = (code) => board.rooms.find((r) => r.roomCode === code);
+
+test('expandReservations turns compact [code,start,end] rows into full objects', () => {
+  const out = expandReservations([[201, '13:00', '16:00']], '2026.07.09');
+  assert.deepEqual(out, [
+    { roomCode: 201, startTime: '2026.07.09 13:00', endTime: '2026.07.09 16:00', title: '', memberId: null, id: null },
+  ]);
+});
+
+test('expandReservations passes full objects through unchanged', () => {
+  const obj = { roomCode: 201, startTime: '2026.07.09 13:00', endTime: '2026.07.09 16:00', title: 'x', memberId: 1 };
+  assert.deepEqual(expandReservations([obj], '2026.07.09'), [obj]);
+});
 
 test('normalizeBoard keeps the date and every room', () => {
   assert.equal(board.date, '2026.07.09');
@@ -30,6 +49,19 @@ test('busy intervals are extracted as HH:mm and sorted by start', () => {
 test('mine flag is set for the current member', () => {
   assert.equal(room(201).busy[0].mine, false); // 타사
   assert.equal(room(201).busy[1].mine, true); // 나(107858)
+});
+
+test('busy intervals carry the reservation id (needed for cancel)', () => {
+  assert.equal(room(201).busy[0].id, 1001);
+  assert.equal(room(201).busy[1].id, 1002);
+});
+
+test('myReservations lists only the current member reservations with ids', () => {
+  const mine = myReservations(board);
+  assert.deepEqual(
+    mine.map((m) => [m.id, m.roomCode, m.start, m.title]),
+    [[1002, 201, '17:00', '팀 회의']],
+  );
 });
 
 test('free intervals are the complement within operating hours', () => {
