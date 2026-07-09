@@ -15,14 +15,22 @@
 
 **전제조건**: [Claude Code](https://claude.com/claude-code), **claude-in-chrome** 확장, Chrome에서 [드림플러스 강남](https://gangnam.dreamplus.asia) 로그인, Node.js 18+
 
-Claude Code에서 아래 두 줄이면 끝입니다(어느 프로젝트에서든 사용 가능):
+Claude Code에서 아래를 **각각 따로** 실행합니다(두 줄을 한 번에 붙여넣지 마세요 — 마켓플레이스 소스 입력창에 두 명령이 합쳐져 실패합니다).
+
+**① 마켓플레이스 추가**
 
 ```
 /plugin marketplace add everex-ai/mlops-dreamplus-reservation-skill
+```
+
+**② 위가 성공한 뒤, 플러그인 설치**
+
+```
 /plugin install dreamplus@everex-dreamplus
 ```
 
-> 저장소가 **public**이어야 사내원이 그대로 추가할 수 있습니다(private면 각자 `GITHUB_TOKEN` 필요).
+> - 저장소가 **public**이어야 사내원이 그대로 추가할 수 있습니다(private면 각자 `GITHUB_TOKEN` 필요).
+> - 축약형이 거부되면 전체 URL로: `/plugin marketplace add https://github.com/everex-ai/mlops-dreamplus-reservation-skill.git`
 
 이후 대화창에 자연어로 말하거나(`"드림플러스 7층 예약현황"`), `/dreamplus:status` 처럼 직접 부릅니다. 로그인이 안 되어 있으면 로그인하라고 안내합니다.
 
