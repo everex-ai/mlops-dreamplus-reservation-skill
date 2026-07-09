@@ -3,7 +3,7 @@
 // 브라우저가 fetch한 예약 배열(JSON)을 stdin으로 받는다. 토큰/네트워크 없음.
 // usage: <reservations.json | node bin/timebar.mjs <room> [date] [--myid ID]
 
-import { parseArgs, boardFromStdin, myId, today, run } from '../lib/cli.mjs';
+import { parseArgs, boardFromStdin, myId, today, useColor, run } from '../lib/cli.mjs';
 import { resolveRoom } from '../lib/board.mjs';
 import { renderTimebar } from '../lib/render.mjs';
 import { normalizeDate } from '../lib/time.mjs';
@@ -24,5 +24,5 @@ run(async () => {
     console.error(`회의실을 찾을 수 없습니다: ${query}`);
     process.exit(1);
   }
-  console.log(renderTimebar(board, room.roomCode));
+  console.log(renderTimebar(board, room.roomCode, { color: useColor(a), shade: !a['no-shade'] }));
 });

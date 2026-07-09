@@ -3,7 +3,7 @@
 // 브라우저가 fetch한 예약 배열(JSON)을 stdin으로 받는다. 토큰/네트워크 없음.
 // usage: <reservations.json | node bin/status.mjs [date] [--floor N] [--cap N] [--start HH:mm] [--end HH:mm] [--myid ID]
 
-import { parseArgs, boardFromStdin, myId, today, run } from '../lib/cli.mjs';
+import { parseArgs, boardFromStdin, myId, today, useColor, run } from '../lib/cli.mjs';
 import { renderStatus } from '../lib/render.mjs';
 import { normalizeDate } from '../lib/time.mjs';
 
@@ -13,7 +13,7 @@ run(async () => {
   const my = a.myid != null ? Number(a.myid) : myId();
 
   const board = await boardFromStdin(date, my);
-  const filters = {};
+  const filters = { color: useColor(a), shade: !a['no-shade'] };
   if (a.floor != null) filters.floor = Number(a.floor);
   if (a.cap != null) filters.minCap = Number(a.cap);
   if (a.start && a.end) {
