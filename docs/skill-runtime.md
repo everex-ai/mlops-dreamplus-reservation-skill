@@ -33,23 +33,32 @@ Node 스크립트(`bin/*.mjs`)는 순수 렌더/판단만 담당한다.
 
 ## 2. 예약 데이터 가져오기 (in-page fetch, 스코프별)
 
-토큰은 `meInfo.jwtToken`을 in-page에서 사용한다. 응답 `code`가 `"301"`이면 만료 →
-탭을 새로고침(앱이 자동 재발급)한 뒤 1회 재시도한다.
+토큰은 `meInfo.jwtToken`을 in-page에서 사용한다.
+
+> ⚠️ **자주 하는 실수 — 날짜 포맷.** 이 API는 날짜를 **점 구분 `YYYY.MM.DD`**로만 받는다
+> (예: `2026.07.09`). **대시 `2026-07-09`를 쓰면 HTTP 500**이 난다. 각 스니펫 맨 위 `DATE`
+> 변수를 **점 구분**으로 설정하는 것만 신경 쓰면 된다(본문 3곳에 자동 반영됨).
+>
+> **오류 구분:**
+> - **HTTP 500 / 요청 실패** → 대개 **요청 포맷(날짜 점 구분)** 문제다. 새로고침하지 말고 포맷을 확인.
+> - 응답 봉투 `code === '301'`(HTTP 200이지만 만료) → 토큰 만료. 탭 새로고침(앱 자동 재발급) 후 1회 재시도.
 
 **하루 예약을 컴팩트하게 (status 그리드용, 층 스코프 권장)** — `[[roomCode,'HH:mm','HH:mm'], ...]`:
 
 ```js
-// javascript_tool — DATE와 FLOOR를 치환. FLOOR 생략 시 전체(단, 크면 층별로 나눠 호출)
+// javascript_tool — 맨 위 두 값만 설정하면 됨
 (async () => {
+  const DATE = '2026.07.09';  // ← 점 구분! 대시(-) 쓰면 500
+  const FLOOR = 2;            // 층 번호. 전체면 0 (단, 크면 층별로 나눠 호출)
   const me = JSON.parse(sessionStorage.getItem('meInfo'));
   const r = await fetch('/api2/meetingroom/reservations', {
     method: 'POST', credentials: 'include',
     headers: { 'Content-Type': 'application/json', Authorization: me.jwtToken },
     body: JSON.stringify({ data: { searchType: 'startTime',
-      startTime: 'DATE 00:00:00', endTime: 'DATE 23:59:59', cancelDate: 'DATE 00:00:00' } }),
+      startTime: `${DATE} 00:00:00`, endTime: `${DATE} 23:59:59`, cancelDate: `${DATE} 00:00:00` } }),
   }).then(x => x.json());
   if (r.code === '301') return 'RELOAD';
-  const lo = FLOOR * 100, hi = lo + 99; // FLOOR 없으면 lo=0, hi=999999
+  const lo = FLOOR ? FLOOR * 100 : 0, hi = FLOOR ? lo + 99 : 999999;
   return JSON.stringify((r.list || [])
     .filter(x => x.roomCode >= lo && x.roomCode <= hi)
     .map(x => [x.roomCode, x.startTime.slice(11, 16), x.endTime.slice(11, 16)]));
@@ -59,12 +68,13 @@ Node 스크립트(`bin/*.mjs`)는 순수 렌더/판단만 담당한다.
 **한 회의실 전체 (timebar용)** — 제목 포함 전체 객체(작음):
 
 ```js
-// ROOMCODE 치환
 (async () => {
+  const DATE = '2026.07.09';  // ← 점 구분! 대시 쓰면 500
+  const ROOMCODE = 208;       // 대상 회의실 코드 (예: 2H=208)
   const me = JSON.parse(sessionStorage.getItem('meInfo'));
   const r = await fetch('/api2/meetingroom/reservations', { method:'POST', credentials:'include',
     headers:{'Content-Type':'application/json',Authorization:me.jwtToken},
-    body: JSON.stringify({data:{searchType:'startTime',startTime:'DATE 00:00:00',endTime:'DATE 23:59:59',cancelDate:'DATE 00:00:00'}})}).then(x=>x.json());
+    body: JSON.stringify({data:{searchType:'startTime',startTime:`${DATE} 00:00:00`,endTime:`${DATE} 23:59:59`,cancelDate:`${DATE} 00:00:00`}})}).then(x=>x.json());
   if (r.code === '301') return 'RELOAD';
   return JSON.stringify((r.list||[]).filter(x=>x.roomCode===ROOMCODE)
     .map(x=>({id:x.id,roomCode:x.roomCode,startTime:x.startTime,endTime:x.endTime,title:x.title,memberId:x.memberId})));
@@ -76,23 +86,36 @@ Node 스크립트(`bin/*.mjs`)는 순수 렌더/판단만 담당한다.
 
 ```js
 (async () => {
+  const DATE = '2026.07.09';  // ← 점 구분! 대시 쓰면 500
+  const s = '14:00', e = '15:00';  // 요청 시간대 'HH:mm' (사전순=시간순)
   const me = JSON.parse(sessionStorage.getItem('meInfo'));
   const r = await fetch('/api2/meetingroom/reservations', { method:'POST', credentials:'include',
     headers:{'Content-Type':'application/json',Authorization:me.jwtToken},
-    body: JSON.stringify({data:{searchType:'startTime',startTime:'DATE 00:00:00',endTime:'DATE 23:59:59',cancelDate:'DATE 00:00:00'}})}).then(x=>x.json());
+    body: JSON.stringify({data:{searchType:'startTime',startTime:`${DATE} 00:00:00`,endTime:`${DATE} 23:59:59`,cancelDate:`${DATE} 00:00:00`}})}).then(x=>x.json());
   if (r.code === '301') return 'RELOAD';
-  const s = 'START', e = 'END';                 // 'HH:mm'은 사전순=시간순
   return JSON.stringify((r.list||[])
     .filter(x => x.startTime.slice(11,16) < e && s < x.endTime.slice(11,16)) // [s,e) 겹침
     .map(x => [x.roomCode, x.startTime.slice(11,16), x.endTime.slice(11,16)]));
 })()
 ```
 
-**내 예약만 (cancel용)** — `memberId === myId` 필터(작음): "한 회의실 전체"와 같되
-`.filter(x => x.memberId === me.id)` 사용.
+**내 예약만 (cancel용)** — `memberId === me.id` 필터(작음):
 
-받은 JSON 문자열을 `bin/*.mjs`에 stdin으로 파이프한다. 예:
-`echo '<json>' | node REPO/bin/status.mjs DATE --floor 2 --myid <myId>`
+```js
+(async () => {
+  const DATE = '2026.07.09';  // ← 점 구분! 대시 쓰면 500
+  const me = JSON.parse(sessionStorage.getItem('meInfo'));
+  const r = await fetch('/api2/meetingroom/reservations', { method:'POST', credentials:'include',
+    headers:{'Content-Type':'application/json',Authorization:me.jwtToken},
+    body: JSON.stringify({data:{searchType:'startTime',startTime:`${DATE} 00:00:00`,endTime:`${DATE} 23:59:59`,cancelDate:`${DATE} 00:00:00`}})}).then(x=>x.json());
+  if (r.code === '301') return 'RELOAD';
+  return JSON.stringify((r.list||[]).filter(x=>x.memberId===me.id)
+    .map(x=>({id:x.id,roomCode:x.roomCode,startTime:x.startTime,endTime:x.endTime,title:x.title,memberId:x.memberId})));
+})()
+```
+
+받은 JSON 문자열을 `bin/*.mjs`에 stdin으로 파이프한다(날짜는 여기서도 **점 구분**). 예:
+`echo '<json>' | node REPO/bin/status.mjs 2026.07.09 --floor 2 --myid <myId>`
 
 ---
 
