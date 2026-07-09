@@ -95,11 +95,10 @@
 dreamplus-res/                         ← GitHub 레포 루트
 ├── README.md                          ← 설치·전제조건·사용법 (사내 공유용)
 ├── lib/                               ← 공유 Node ESM 모듈 (외부 의존성 0, 내장 fetch)
-│   ├── time.mjs                       ← 날짜/시간 포맷·슬롯 계산 (08–21, 30분)
+│   ├── time.mjs                       ← 날짜/시간 포맷·슬롯 계산 (08–21, 30분)·CJK 폭
 │   ├── api.mjs                        ← apiFetch + get/create/cancel, 301→TokenExpiredError
-│   ├── rooms.mjs                      ← 방 카탈로그·resolveRoom·nearestRooms(층거리)
-│   ├── availability.mjs               ← 예약목록 → busy/free 슬롯 계산
-│   └── render.mjs                     ← ASCII 렌더 (단일 바 / 멀티 그리드)
+│   ├── board.mjs                      ← buildBoard(정규화)·resolveRoom·isFree·nearestFreeRooms
+│   └── render.mjs                     ← Board→ASCII 렌더 (renderTimebar / renderStatus)
 ├── bin/                               ← 스킬이 호출하는 CLI 엔트리 (DP_TOKEN env 사용)
 │   ├── status.mjs                     ← 조회
 │   ├── timebar.mjs                    ← 단일 회의실 바
@@ -127,13 +126,31 @@ dreamplus-res/                         ← GitHub 레포 루트
 
 > 토큰은 Chrome→스크립트로만 전달되며 사용자에게 출력하지 않는다.
 
-### 3.2 lib 모듈 인터페이스 (초안)
+### 3.2 핵심 데이터 구조: `Board` (단일 소스)
 
-- `time.mjs`: `dayRange(date)`, `toApiDateTime(date, "HH:mm")`, `SLOTS`(08:00~20:30, 26개), `slotIndex(hhmm)`
-- `api.mjs`: `getRooms(token, date)`, `getReservations(token, date)`, `createReservation(token, {roomCode,start,end,title})`, `cancelReservation(token, id)` — 봉투 검사, 301→`TokenExpiredError`
-- `rooms.mjs`: `resolveRoom(rooms, query)`(이름/코드/"2H"/"2층 A"), `nearestRooms(rooms, target, {minCap})`(같은 층 우선, 다음 `|floorΔ|` 최소순), `floorOf(roomCode)`
-- `availability.mjs`: `busyIntervals(reservations, roomCode)`, `freeSlots(room, reservations, date)`, `isFree(roomCode, start, end, reservations)`
-- `render.mjs`: `renderSingle(room, reservations, date)`, `renderGrid(rooms, reservations, date, filters)`
+fetch/정규화를 **한 곳**에 모으고, 모든 뷰·동작은 이 `Board`의 순수 함수로 만든다. (timebar = status를 방 1개로 필터한 것)
+
+```js
+// buildBoard(token, date) → Board
+{
+  date: "2026.07.09",
+  rooms: [
+    { roomCode:208, name:"Meeting Room 2H", floor:2, cap:4, equipment:"TV, 화이트보드", point:10000,
+      busy: [ { start:"12:30", end:"13:00", title:"...", mine:false } ],  // 예약 구간
+      free: [ { start:"08:00", end:"12:30" }, { start:"13:00", end:"21:00" } ] } // 가능 구간
+    // ... 38개
+  ]
+}
+```
+
+### 3.3 lib 모듈 인터페이스 (초안)
+
+- `time.mjs`: `dayRange(date)`, `toApiDateTime(date,"HH:mm")`, `SLOTS`(08:00~20:30, 26개), `slotIndex(hhmm)`, `dispWidth(str)`(CJK=2)
+- `api.mjs`: `getRooms(token,date)`, `getReservations(token,date)`, `createReservation(token,{roomCode,start,end,title})`, `cancelReservation(token,id)` — 봉투 검사, `code==="301"`→`TokenExpiredError`
+- `board.mjs`: **`buildBoard(token, date)`** (getRooms+getReservations→정규화), `roomsFrom(board,filters)`, `isFree(board, roomCode, start, end)`, `nearestFreeRooms(board, target, {start,end,minCap})`(같은 층 우선→`|floorΔ|` 최소순), `resolveRoom(board, query)`(이름/코드/"2H"/"2층 A")
+- `render.mjs`: **`renderTimebar(board, roomCode)`** (View A), **`renderStatus(board, filters)`** (View B) — 둘 다 Board만 소비하는 순수 함수, `render.mjs`는 fetch를 모른다
+
+> 이점: 슬롯 계산·바 렌더 로직이 단일 소스. 뷰 추가 = Board 새 소비자(데이터 배선 X). 테스트 = Board 픽스처 주입만으로 렌더/동작 검증.
 
 ---
 
