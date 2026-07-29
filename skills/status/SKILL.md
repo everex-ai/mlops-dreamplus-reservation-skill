@@ -10,23 +10,33 @@ description: 드림플러스 강남 회의실 예약 현황을 조회한다. 회
 - **층/시간대/정원**만 말하면 → 여러 회의실 그리드 — `status.mjs`
 
 > 경로: 이 스킬이 로드될 때 안내되는 base 디렉토리의 **두 단계 상위가 플러그인 루트**다(이하 `REPO`).
-> 스크립트=`REPO/bin/*.mjs`, 공통 런타임 절차=`REPO/docs/skill-runtime.md`.
+> 로그인·네트워크는 스크립트가 직접 처리한다. 브라우저는 쓰지 않는다.
 
 ## 절차
 
-1. **프리플라이트** — `REPO/docs/skill-runtime.md`의 로그인 확인. 미로그인이면 안내 후 중단. `myId` 확보.
-2. **범위 판단** — 요청에 특정 회의실("2H", "11A", "Meeting Room 2A")이 있으면 **타임바**,
-   층/시간대/정원 위주면 **그리드**. 날짜 기본 오늘. 회의실 코드는 `REPO/data/rooms.catalog.json` 참조.
+1. **범위 판단** — 요청에 특정 회의실("2H", "11A", "Meeting Room 2A")이 있으면 **타임바**,
+   층/시간대/정원 위주면 **그리드**. 날짜 기본 오늘, `YYYY.MM.DD` 형식.
+   회의실 코드는 `REPO/data/rooms.catalog.json` 참조.
 
-### A. 특정 회의실 타임바
-3. `REPO/docs/skill-runtime.md`의 **"한 회의실 전체"** in-page fetch로 해당 roomCode 예약(제목 포함)을 받는다.
-4. `echo '<json>' | node REPO/bin/timebar.mjs <회의실> <YYYY.MM.DD> --myid <myId>`
-   내 예약은 "(내 예약)", 인접 예약은 `█/▓`로 구분.
+2. **실행** — 둘 중 하나를 그대로 실행한다.
 
-### B. 멀티 회의실 그리드
-3. `REPO/docs/skill-runtime.md`의 **"하루 예약 컴팩트"** in-page fetch로 해당 층 예약을
-   `[[roomCode,'HH:mm','HH:mm'], ...]`로 받는다(전체는 크니 층 스코프 권장). `RELOAD`면 새로고침 후 재시도.
-4. `echo '<json>' | node REPO/bin/status.mjs <YYYY.MM.DD> --floor <N> [--cap <N>] [--start HH:mm --end HH:mm] --myid <myId>`
-   `--start/--end`를 주면 그 시간대에 빈 회의실만 필터.
+   **A. 특정 회의실 타임바**
+   ```
+   node REPO/bin/timebar.mjs <회의실> <YYYY.MM.DD>
+   ```
+   내 예약은 "(내 예약)", 인접 예약은 `█/▓`로 구분된다.
 
-5. **결과 전달** — 렌더 결과를 그대로 보여주고 필요시 "종일가능/가장 빈 방"을 한 줄 요약.
+   **B. 멀티 회의실 그리드**
+   ```
+   node REPO/bin/status.mjs <YYYY.MM.DD> [--floor N] [--cap N] [--start HH:mm --end HH:mm]
+   ```
+   `--start/--end`를 주면 그 시간대에 **비어있는** 회의실만 남는다.
+
+3. **결과 전달** — 렌더 결과를 그대로 보여주고 필요시 "종일가능/가장 빈 방"을 한 줄 요약.
+
+## 참고
+
+- 읽기 전용이라 확인 없이 실행해도 된다.
+- 자격증명이 없으면 스크립트가 설정 방법을 안내하며 종료한다(종료코드 2).
+  그 안내를 사용자에게 그대로 전달하고, **비밀번호를 대신 입력하거나 대화창에서 묻지 않는다.**
+- 토큰 만료는 스크립트가 자동으로 재로그인해 처리한다. 재시도를 지시할 필요 없다.
