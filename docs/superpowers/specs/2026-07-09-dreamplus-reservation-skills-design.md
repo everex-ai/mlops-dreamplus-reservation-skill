@@ -3,7 +3,12 @@
 - 작성일: 2026-07-09
 - 대상 사이트: `https://gangnam.dreamplus.asia/reservation/meetingroom` (드림플러스 강남)
 - 목표: 예약 현황 조회 / 타임바 시각화 / 예약 / 취소를 대화형으로 수행하는 Claude Code 스킬 세트
-- 배포: **GitHub 공개 레포로 사내 공유** (Claude Code + claude-in-chrome 확장 사용자용)
+- 배포: **GitHub 공개 레포로 사내 공유** (Claude Code 사용자용)
+
+> **2026-07-29 개정** — 3장의 아키텍처가 **하이브리드(브라우저가 네트워크 담당)에서
+> API 직접 호출로 교체**되었습니다. claude-in-chrome 의존이 제거되고 Node가 직접 로그인합니다.
+> 2장(엔드포인트·데이터 모델)과 5장(타임바 디자인)은 그대로 유효합니다.
+> 인증 절차와 API 규격은 [`docs/api.md`](../../api.md)를 보세요.
 
 ---
 
@@ -87,9 +92,9 @@
 
 ---
 
-## 3. 아키텍처 (하이브리드)
+## 3. 아키텍처 (API 직접 호출)
 
-**결정**: 토큰은 Chrome에서 신선하게 추출, API 호출은 Node 스크립트에서 수행. 기능별로 별도 스킬.
+**결정**: Node가 직접 로그인해 API를 호출한다. 브라우저·확장은 쓰지 않는다. 기능별로 별도 스킬.
 
 ```
 dreamplus-res/                         ← GitHub 레포 = Claude Code 플러그인 겸 마켓플레이스
@@ -97,19 +102,21 @@ dreamplus-res/                         ← GitHub 레포 = Claude Code 플러그
 ├── .claude-plugin/
 │   ├── plugin.json                    ← 플러그인 매니페스트 (name: dreamplus)
 │   └── marketplace.json               ← 마켓플레이스 카탈로그 (everex-dreamplus)
-├── lib/                               ← 공유 Node ESM 모듈 (외부 의존성 0, 내장 fetch)
+├── lib/                               ← 공유 Node ESM 모듈 (외부 의존성 0, 내장 fetch/crypto)
 │   ├── time.mjs                       ← 날짜/시간·슬롯(08–21,30분)·CJK 폭·요일
-│   ├── api.mjs                        ← 브라우저 fetch의 참조 규격(get/create/cancel, 301 처리)
+│   ├── auth.mjs                       ← 로그인(RSA 암호화)·세션 캐시·withAuth(만료 시 1회 재로그인)
+│   ├── api.mjs                        ← REST 클라이언트 (Referer 필수, 301 처리)
 │   ├── catalog.mjs                    ← 커밋된 회의실 카탈로그 로더
 │   ├── board.mjs                      ← normalizeBoard·isFree·resolveRoom·nearestFreeRooms·expand
 │   ├── render.mjs                     ← Board→ASCII (timebar/status, shade·color)
-│   └── cli.mjs                        ← 인자 파서·stdin 로드·색상 판정
-├── bin/                               ← 스킬이 호출하는 CLI (예약 데이터를 stdin으로 받음)
+│   └── cli.mjs                        ← 인자 파서·Board 로딩(fetch/fixture)·색상 판정
+├── bin/                               ← 스킬이 호출하는 CLI (직접 로그인·조회)
 │   ├── status.mjs / timebar.mjs       ← 그리드 / 단일 회의실 (한 조회 스킬이 분기 호출)
-│   ├── book.mjs / cancel.mjs          ← 예약(+폴백) / 취소 — @@ACTION@@ emit
+│   ├── book.mjs / cancel.mjs          ← 예약(+대안) / 취소 — 기본 dry-run, --confirm에서만 실행
+│   ├── login.mjs                      ← 로그인 확인·세션 관리(--force/--logout)
 │   └── refresh-catalog.mjs            ← 카탈로그 재생성
 ├── data/rooms.catalog.json            ← 실측 38개 방(정적)
-├── docs/skill-runtime.md              ← 스킬 공용 실행 절차·fetch 스니펫
+├── docs/api.md                        ← 인증 절차·엔드포인트 규격
 ├── test/ (+fixtures/)                 ← 순수 로직 단위 테스트 (실측 픽스처)
 └── skills/                            ← 플러그인 스킬 (/dreamplus:<name>)
     ├── status/SKILL.md                ← 조회(현황 그리드 + 단일 타임바 통합)
@@ -117,20 +124,21 @@ dreamplus-res/                         ← GitHub 레포 = Claude Code 플러그
     └── cancel/SKILL.md                ← 취소
 ```
 
-### 3.1 실행 흐름 (모든 스킬 공통) — **토큰은 브라우저 밖으로 안 나감**
+### 3.1 실행 흐름 (모든 스킬 공통) — **Node가 직접 로그인**
 
-> 구현 확정: 초기엔 "토큰을 Node로 전달(DP_TOKEN)"을 검토했으나, 이 하네스에서 토큰을 셸로
-> 옮기는 것이 안전필터/클립보드 제약으로 불안정했다. 대신 **브라우저가 네트워크(토큰 보유),
-> Node는 순수 렌더/판단**으로 정리했다. 상세 절차는 `docs/skill-runtime.md`.
+> 개정 이력: 최초 설계는 "토큰을 Node로 전달(DP_TOKEN)"이었고, 그것이 하네스 제약으로 어려워
+> "브라우저가 네트워크, Node는 렌더만"인 하이브리드가 됐다. 이후 **로그인 API를 Node에서
+> 재현할 수 있음을 확인**(공개키 조회 + RSA 암호화 + `/auth/login`)하여 브라우저 의존을 걷어냈다.
+> 대가는 비밀번호의 로컬 보관이다. 상세는 `docs/api.md`.
 
-1. **프리플라이트** — claude-in-chrome으로 드림플러스 탭 확보. in-page JS로 `sessionStorage.meInfo`
-   확인 → 없거나 `/login`이면 **"Chrome에서 드림플러스에 로그인해 주세요"** 안내 후 중단(요구사항 1). `myId` 확보.
-2. **읽기** — 브라우저가 `meInfo.jwtToken`으로 예약을 in-page fetch(요구사항 2) → **민감정보 제거한
-   데이터만** 반환. 그리드는 컴팩트 `[[roomCode,'HH:mm','HH:mm']]`(층 스코프면 컨텍스트에 들어감),
-   단일 방/내 예약은 전체 객체(작음). `code==="301"`이면 탭 새로고침(앱 자동 재발급) 후 1회 재시도.
-3. **렌더/판단** — 데이터를 `bin/*.mjs`에 stdin으로 파이프. Node는 토큰·네트워크 없음.
-4. **쓰기(book/cancel)** — Node가 `@@ACTION@@` payload를 emit → **사용자 확인 후** 브라우저에서
-   POST(create)/DELETE(cancel) in-page 실행.
+1. **인증** — `~/.dreamplus/session.json`의 캐시된 토큰을 쓴다. 없으면
+   `~/.dreamplus/credentials`로 로그인한다. 자격증명이 없으면 설정 방법을 안내하고 종료(코드 2).
+   `myId`는 로그인 응답의 `id`에서 온다.
+2. **읽기** — `getReservations(token, date)`로 그 날짜 전 회의실 예약을 받아 카탈로그와 조인해 `Board`로 만든다.
+   응답 `code==="301"`(만료)이면 **1회 재로그인 후 재시도**한다(`withAuth`).
+3. **렌더/판단** — 순수 함수(`render.mjs`/`board.mjs`)가 `Board`만 소비한다. 네트워크를 모른다.
+4. **쓰기(book/cancel)** — 기본은 dry-run으로 계획만 출력한다. **사용자 확인 후 `--confirm`**이
+   붙었을 때만 POST(create)/DELETE(cancel)를 실행한다.
 
 ### 3.2 핵심 데이터 구조: `Board` (단일 소스)
 
@@ -225,19 +233,23 @@ Meeting Room 2H · 2F · 4인 · 10,000P/30분 · 2026-07-09(목)
 
 ## 7. 테스트
 
-- 순수 로직(time/rooms/availability/render)은 **캡처한 실제 응답 픽스처**로 단위 테스트
-- api.mjs는 fetch 목으로 봉투/301 처리 테스트
+- 순수 로직(time/board/render)은 **캡처한 실제 응답 픽스처**로 단위 테스트
+- `api.mjs`는 fetch 목으로 봉투·301·Referer·비JSON 응답 처리 테스트
+- `auth.mjs`는 테스트용 RSA 키쌍을 만들어 **암호문을 복호화해** 규격 일치를 검증하고,
+  세션 캐시·만료 재시도는 목 fetch로 테스트. `DP_HOME`으로 홈 디렉터리를 tmp에 격리한다
+- `bin/*`는 `--fixture <파일>`로 네트워크 없이 실행 가능 → 오프라인 확인용
 - 조회·타임바는 읽기 전용 → 라이브 스모크 안전
-- 예약·취소는 dry-run 우선 + 같은 날 슬롯으로 1회 확인 테스트(자동 취소)
+- 예약·취소는 dry-run이 기본이라 `--confirm` 없이 안전하게 확인 가능
 
 ---
 
 ## 8. 공유(GitHub) 고려사항
 
-- README에 전제조건 명시: Claude Code, **claude-in-chrome 확장**, Chrome에서 드림플러스 로그인
-- 개인정보/토큰 하드코딩 금지 — 전부 런타임 meInfo에서
-- 외부 의존성 0(내장 fetch) → clone 후 바로 동작
-- 스킬은 `.claude/skills/`에 포함(레포 clone 시 프로젝트 스코프로 인식) + `~/.claude/skills`로 복사하는 설치 안내
+- README에 전제조건 명시: Claude Code, Node 18+, 드림플러스 계정 (확장 불필요)
+- **계정 정보는 레포에 들어가지 않는다** — `~/.dreamplus/`(0600), `.gitignore`에도 포함
+- README에 비밀번호가 로컬 평문 보관됨을 **명시**한다. 이전 하이브리드 대비 트레이드오프이므로 숨기지 않는다
+- 외부 의존성 0(내장 fetch/crypto) → clone 후 바로 동작
+- 플러그인/마켓플레이스로 배포 (`/plugin marketplace add` → `/plugin install`)
 
 ---
 

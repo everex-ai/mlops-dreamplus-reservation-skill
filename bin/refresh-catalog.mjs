@@ -1,19 +1,24 @@
 #!/usr/bin/env node
-// 회의실 카탈로그 재생성 — 방 구성(정원/장비/신설)이 바뀌었을 때만.
-// 브라우저가 fetch한 /api2/meetingrooms 결과(JSON)를 stdin으로 받아 data/rooms.catalog.json에 쓴다.
-// usage: <meetingrooms.json | node bin/refresh-catalog.mjs
+// 회의실 카탈로그 재생성 — 방 구성(정원/장비/신설)이 바뀌었을 때만 실행한다.
+// /api2/meetingrooms 를 직접 조회해 data/rooms.catalog.json 에 쓴다.
+// usage: node bin/refresh-catalog.mjs [--date YYYY.MM.DD]
 
 import { writeFileSync } from 'node:fs';
-import { readStdin, run } from '../lib/cli.mjs';
+import { parseArgs, today, run } from '../lib/cli.mjs';
+import { withAuth } from '../lib/auth.mjs';
+import { getRooms } from '../lib/api.mjs';
+import { normalizeDate } from '../lib/time.mjs';
 
 run(async () => {
-  const raw = (await readStdin()).trim();
-  if (!raw) {
-    console.error('입력이 없습니다. 브라우저의 /api2/meetingrooms 결과를 파이프로 넘기세요.');
+  const a = parseArgs(process.argv.slice(2));
+  const date = normalizeDate(a.date || today());
+
+  const list = await withAuth((token) => getRooms(token, date));
+  if (list.length === 0) {
+    console.error('회의실 목록이 비어 있습니다. 카탈로그를 덮어쓰지 않았습니다.');
     process.exit(1);
   }
-  const parsed = JSON.parse(raw);
-  const list = Array.isArray(parsed) ? parsed : parsed.list || [];
+
   const rooms = list
     .map((r) => ({
       roomCode: r.roomCode,

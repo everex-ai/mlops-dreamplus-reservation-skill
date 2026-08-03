@@ -21,6 +21,16 @@ function fakeFetch(envelope) {
   return impl;
 }
 
+/** API 대신 SPA HTML이 돌아오는 경우 (Referer 누락 시 서버가 하는 일) */
+function htmlFetch(status = 404) {
+  return async () => ({
+    status,
+    json: async () => {
+      throw new SyntaxError('Unexpected token < in JSON');
+    },
+  });
+}
+
 const ok = (extra = {}) => ({ apiVersion: '1.0', result: true, code: '200', message: '', ...extra });
 
 test('apiFetch returns the envelope on code 200', async () => {
@@ -37,6 +47,28 @@ test('apiFetch sends raw token in Authorization and JSON body', async () => {
   assert.equal(c.headers['Content-Type'], 'application/json');
   assert.deepEqual(c.json, { a: 1 });
   assert.match(c.url, /\/api2\/x$/);
+});
+
+test('apiFetch always sends Referer — /api2/* returns SPA HTML without it', async () => {
+  const f = fakeFetch(ok());
+  await apiFetch('TOK', '/api2/x', 'POST', { a: 1 }, f);
+  assert.match(f.calls[0].headers.Referer, /^https:\/\/gangnam\.dreamplus\.asia\//);
+});
+
+test('apiFetch omits Authorization when there is no token (/auth/* endpoints)', async () => {
+  const f = fakeFetch(ok());
+  await apiFetch(null, '/auth/publickey', 'POST', undefined, f);
+  assert.equal('Authorization' in f.calls[0].headers, false);
+  assert.equal(f.calls[0].body, undefined);
+});
+
+test('apiFetch reports a non-JSON response instead of leaking a parse error', async () => {
+  await assert.rejects(() => apiFetch('TOK', '/api2/x', 'POST', {}, htmlFetch(404)), (e) => {
+    assert.ok(e instanceof ApiError);
+    assert.match(e.message, /JSON을 반환하지 않았습니다/);
+    assert.match(e.message, /404/);
+    return true;
+  });
 });
 
 test('apiFetch throws TokenExpiredError on code 301', async () => {

@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 // 단일 회의실 타임바
-// 브라우저가 fetch한 예약 배열(JSON)을 stdin으로 받는다. 토큰/네트워크 없음.
-// usage: <reservations.json | node bin/timebar.mjs <room> [date] [--myid ID]
+// usage: node bin/timebar.mjs <room> [date] [--fixture f]
 
-import { parseArgs, boardFromStdin, myId, today, useColor, run } from '../lib/cli.mjs';
+import { parseArgs, loadBoard, today, useColor, run } from '../lib/cli.mjs';
 import { resolveRoom } from '../lib/board.mjs';
 import { renderTimebar } from '../lib/render.mjs';
 import { normalizeDate } from '../lib/time.mjs';
@@ -16,9 +15,12 @@ run(async () => {
     process.exit(1);
   }
   const date = normalizeDate(a.date || a._[1] || today());
-  const my = a.myid != null ? Number(a.myid) : myId();
 
-  const board = await boardFromStdin(date, my);
+  const board = await loadBoard(date, {
+    fixture: a.fixture,
+    myId: a.myid != null ? Number(a.myid) : undefined,
+  });
+
   const room = resolveRoom(board, query);
   if (!room) {
     console.error(`회의실을 찾을 수 없습니다: ${query}`);
